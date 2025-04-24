@@ -15,8 +15,8 @@ sealed class BottonNavItem(val route: String,
     object Favorites: BottonNavItem(
         route = Route.FAVOURITES,
         title = "Favorites",
-        icon = R.drawable.favourites,
-        iconFocused = R.drawable.favourites2
+        icon = R.drawable.bookmark,
+        iconFocused = R.drawable.bookmark2
     )
     object Profile: BottonNavItem(
         route = Route.PROFILE,

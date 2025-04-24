@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.yurtok.domain.useCase.auth.GetCurrentUseCase
 import com.example.yurtok.domain.useCase.auth.LogoutUseCase
 import com.example.yurtok.presentation.state.Resource
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val getCurrentUseCase: GetCurrentUseCase,
+    getCurrentUseCase: GetCurrentUseCase,
     private val logoutUseCase: LogoutUseCase
 ) :ViewModel() {
 
@@ -22,11 +23,12 @@ class ProfileViewModel @Inject constructor(
     val user: LiveData<FirebaseUser?> get() = _user
 
     init {
-        _user.value = getCurrentUseCase()
+        _user.value = FirebaseAuth.getInstance().currentUser
     }
 
     fun logout() {
         logoutUseCase()
+        FirebaseAuth.getInstance().signOut()
         _user.value = null
     }
 }

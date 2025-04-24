@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">YURTOK</string>
+    <string-array name="category">
+        <item>Трудовое право</item>
+        <item>Семейное право</item>
+        <item>Гражданское право</item>
+        <item>Уголовное право</item>
+        <item>Конституционное npaво</item>
+        <item>Административное право</item>
+        <item>Экологическое право</item>
+    </string-array>
+    <string name="favorites">Избранное</string>
 </resources>

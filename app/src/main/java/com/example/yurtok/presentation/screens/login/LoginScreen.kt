@@ -175,6 +175,7 @@ fun LoginScreen(
                 LaunchedEffect(Unit) {
                     navController.navigate(Route.PROFILE){
                         popUpTo(Route.LOGIN){inclusive = true}
+                        popUpTo(Route.SEARCH) { saveState = true }
                     }
                 }
             }

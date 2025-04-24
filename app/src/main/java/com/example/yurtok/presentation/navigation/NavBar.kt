@@ -6,20 +6,27 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.yurtok.R
+import com.example.yurtok.presentation.screens.profile.ProfileViewModel
 import kotlinx.coroutines.selects.select
 
 @Composable
-fun NavBar(navController: NavHostController, isShowBottomBar: MutableState<Boolean>){
+fun NavBar(navController: NavHostController,
+           isShowBottomBar: MutableState<Boolean>,
+           profileViewModel: ProfileViewModel = hiltViewModel()
+){
+    val user by profileViewModel.user.observeAsState()
 
     val navItem = listOf(
         BottonNavItem.Search,
@@ -28,8 +35,8 @@ fun NavBar(navController: NavHostController, isShowBottomBar: MutableState<Boole
     )
 
     if(isShowBottomBar.value) {
-        BottomNavigation(backgroundColor = colorResource(id = R.color.black),
-            contentColor = Color.White
+        BottomNavigation(backgroundColor = colorResource(id = R.color.white),
+            contentColor = Color.Black
         ){
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
@@ -41,21 +48,24 @@ fun NavBar(navController: NavHostController, isShowBottomBar: MutableState<Boole
                             contentDescription = items.title
                         )
                     },
-                    selectedContentColor = Color.White,
-                    unselectedContentColor = Color.White.copy(0.4f),
+                    selectedContentColor = Color.Black,
+                    unselectedContentColor = Color.Black.copy(0.4f),
                     alwaysShowLabel = true,
                     selected = currentRoute == items.route,
-                    onClick = { navController.navigate(items.route) {
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
+                    onClick = { val destinationRoute = if (items is BottonNavItem.Profile && user == null) {
+                        Route.LOGIN  // Если пользователь не авторизован, открываем регистрацию
+                    } else {
+                        items.route
+                    }
+                        navController.navigate(destinationRoute) {
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) {
+                                    saveState = true
+                                }
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true }
                     }
                 )
             }

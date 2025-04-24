@@ -4,7 +4,7 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24"
-    android:tint="#FFFFFF"
+    android:tint="@color/black"
     tools:ignore="MissingDefaultResource">
     <!-- Полная заливка круга -->
     <path

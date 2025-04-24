@@ -17,8 +17,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.yurtok.R
+import com.example.yurtok.presentation.screens.favorit.FavoritesScreen
 import com.example.yurtok.presentation.screens.login.LoginScreen
 import com.example.yurtok.presentation.screens.profile.ProfileScreen
+import com.example.yurtok.presentation.screens.search.SearchScreen
 import com.example.yurtok.presentation.screens.signup.SignupScreen
 
 @Composable
@@ -32,7 +34,7 @@ fun MainScreen(){
         content = {
             NavHost(modifier = Modifier.padding(it),
                 navController = navController,
-                startDestination = Route.LOGIN
+                startDestination = Route.SEARCH
             ){
                 composable(Route.LOGIN){
                     isShowBottomBar.value = false
@@ -44,7 +46,7 @@ fun MainScreen(){
                 }
                 composable(Route.SEARCH){
                     isShowBottomBar.value = true
-
+                    SearchScreen(navController)
                 }
                 composable(Route.PROFILE){
                     isShowBottomBar.value = true
@@ -52,6 +54,7 @@ fun MainScreen(){
                 }
                 composable(Route.FAVOURITES) {
                     isShowBottomBar.value = true
+                    FavoritesScreen(navController)
                 }
             }
         })
