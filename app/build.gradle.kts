@@ -87,13 +87,25 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation (libs.androidx.material)
     //Api
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     implementation(libs.okhttp)
     implementation (libs.androidx.foundation.v160)
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
+    //Retrofit
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    //dataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.5")
+    //Для работы с фото
+    implementation(libs.coil.compose)
+    // Shimmer
+    implementation (libs.accompanist.placeholder.material)
 
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.33.2-alpha")
 }
 
 kapt {

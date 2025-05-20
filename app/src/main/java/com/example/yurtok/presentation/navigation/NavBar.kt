@@ -5,6 +5,7 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -26,11 +27,12 @@ fun NavBar(navController: NavHostController,
            isShowBottomBar: MutableState<Boolean>,
            profileViewModel: ProfileViewModel = hiltViewModel()
 ){
-    val user by profileViewModel.user.observeAsState()
+    val user by profileViewModel.user.collectAsState()
 
     val navItem = listOf(
         BottonNavItem.Search,
         BottonNavItem.Favorites,
+        BottonNavItem.Application,
         BottonNavItem.Profile
     )
 

@@ -1,5 +1,8 @@
 [versions]
+accompanistPlaceholderMaterial = "0.36.0"
 agp = "8.6.1"
+coilCompose = "2.6.0"
+converterGson = "2.11.0"
 firebaseAuth = "23.2.0"
 firebaseBom = "33.10.0"
 foundation = "1.7.5"
@@ -18,16 +21,20 @@ material = "1.7.8"
 navigationCompose = "2.8.9"
 firebaseCrashlyticsBuildtools = "3.0.3"
 okhttp = "4.12.0"
+retrofit = "2.11.0"
 runtimeLivedata = "1.7.8"
 constraintlayout = "2.2.1"
 
 [libraries]
+accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation", version = "1.7.8" }
 androidx-foundation-v160 = { module = "androidx.compose.foundation:foundation", version.ref = "foundationVersion" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
@@ -49,6 +56,7 @@ firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "fireb
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

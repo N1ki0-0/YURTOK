@@ -7,7 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yurtok.domain.useCase.auth.LoginUseCase
+import com.example.yurtok.domain.model.User
+import com.example.yurtok.domain.useCase.auth.LoginUserUseCase
 import com.example.yurtok.presentation.state.Resource
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,29 +19,33 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUserUseCase
 ): ViewModel() {
-
-    //хранение состояния аунтификации пользователя при входе
-    private val _loginFlow = MutableStateFlow<Resource<FirebaseUser>?>(null)
-    val loginFlow: StateFlow<Resource<FirebaseUser>?> = _loginFlow
 
     var email by mutableStateOf("")
         private set
-
     var password by mutableStateOf("")
         private set
 
-    fun login() = viewModelScope.launch{
-        _loginFlow.value = Resource.Loading
-        val result = loginUseCase.invoke(email, password)
-        _loginFlow.value = result
-    }
+    private val _loginFlow = MutableStateFlow<Resource<User>?>(null)
+    val loginFlow: StateFlow<Resource<User>?> = _loginFlow
 
-    fun OnEvent(event: LoginEvent){
-        when(event){
+    fun onEvent(event: LoginEvent) {
+        when (event) {
             is LoginEvent.OnEmailChange -> email = event.email
             is LoginEvent.OnPasswordChange -> password = event.password
+        }
+    }
+
+    fun login() {
+        viewModelScope.launch {
+            _loginFlow.value = Resource.Loading
+            try {
+                val user = loginUseCase(email, password)
+                _loginFlow.value = Resource.Success(user)
+            } catch (e: Exception) {
+                _loginFlow.value = Resource.Failure(e)
+            }
         }
     }
 

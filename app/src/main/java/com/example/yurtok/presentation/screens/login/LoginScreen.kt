@@ -1,6 +1,7 @@
 package com.example.yurtok.presentation.screens.login
 
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +48,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.yurtok.R
 import com.example.yurtok.presentation.navigation.Route
+import com.example.yurtok.presentation.screens.application.ApplicationsViewModel
+import com.example.yurtok.presentation.screens.favorit.FavoritesViewModel
 import com.example.yurtok.presentation.screens.profile.MyTextField
 import com.example.yurtok.presentation.state.Resource
 
@@ -54,6 +57,8 @@ import com.example.yurtok.presentation.state.Resource
 @Composable
 fun LoginScreen(
     navController: NavHostController,
+    favoritesViewModel: FavoritesViewModel = hiltViewModel(),
+    applicationsViewModel: ApplicationsViewModel = hiltViewModel(),
     viewModel: LoginViewModel = hiltViewModel()
 ){
 
@@ -89,7 +94,7 @@ fun LoginScreen(
             hint = "Email",
             leadingIcon = Icons.Outlined.Email,
             keyboardType = KeyboardType.Email,
-            onValueChange = { viewModel.OnEvent(LoginEvent.OnEmailChange(it)) }
+            onValueChange = { viewModel.onEvent(LoginEvent.OnEmailChange(it)) }
 
         )
 
@@ -98,7 +103,7 @@ fun LoginScreen(
             hint = "Password",
             leadingIcon = Icons.Outlined.Lock,
             isPassword = true,
-            onValueChange = {viewModel.OnEvent(LoginEvent.OnPasswordChange(it))}
+            onValueChange = {viewModel.onEvent(LoginEvent.OnPasswordChange(it))}
         )
 
         Button(
@@ -170,6 +175,7 @@ fun LoginScreen(
             is Resource.Failure -> {
                 val context = LocalContext.current
                 Toast.makeText(context, it.e.message, Toast.LENGTH_LONG).show()
+                Log.e("Map", "${it.e.message}")
             }
             is Resource.Success -> {
                 LaunchedEffect(Unit) {

@@ -1,6 +1,10 @@
 package com.example.yurtok.presentation.screens.signup
 
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
 import com.example.yurtok.R
 import com.example.yurtok.presentation.navigation.Route
 import com.example.yurtok.presentation.screens.login.LoginEvent
@@ -53,7 +59,13 @@ fun SignupScreen(
     viewModel: SignupViewModel = hiltViewModel()
     ){
 
-    val signupFlow = viewModel.signupFlow.collectAsState().value
+    val signupFlow by viewModel.registerState.collectAsState()
+
+    val pickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        viewModel.onEvent(SignupEvent.OnAvatarChange(uri))
+    }
 
     Column(
         modifier = Modifier
@@ -118,7 +130,7 @@ fun SignupScreen(
             hint = "Username",
             leadingIcon = Icons.Outlined.AccountCircle,
             keyboardType = KeyboardType.Text,
-            onValueChange = { viewModel.OnEvent(SignupEvent.OnNameChange(it)) }
+            onValueChange = { viewModel.onEvent(SignupEvent.OnNameChange(it)) }
         )
 
         MyTextField(
@@ -126,7 +138,7 @@ fun SignupScreen(
             hint = "Email",
             leadingIcon = Icons.Outlined.Email,
             keyboardType = KeyboardType.Email,
-            onValueChange = { viewModel.OnEvent(SignupEvent.OnEmailChange(it)) }
+            onValueChange = { viewModel.onEvent(SignupEvent.OnEmailChange(it)) }
         )
 
         MyTextField(
@@ -134,8 +146,15 @@ fun SignupScreen(
             hint = "Password",
             leadingIcon = Icons.Outlined.Lock,
             isPassword = true,
-            onValueChange = {viewModel.OnEvent(SignupEvent.OnPasswordChange(it))}
+            onValueChange = {viewModel.onEvent(SignupEvent.OnPasswordChange(it))}
         )
+
+        Button(onClick = { pickerLauncher.launch("image/*") }) {
+            Text("Выбрать аватар")
+        }
+        viewModel.avatar?.let { uri ->
+            Image(painter = rememberImagePainter(uri), contentDescription = null, Modifier.size(80.dp))
+        }
 
         Button(
             onClick = {viewModel.signup() },
@@ -166,23 +185,24 @@ fun SignupScreen(
 
         Spacer(modifier = Modifier.height(1.dp))
     }
-    signupFlow.let {
-        when(it){
-            is Resource.Loading -> {
 
-            }
-            is Resource.Failure -> {
-                val context = LocalContext.current
-                Toast.makeText(context, it.e.message, Toast.LENGTH_LONG).show()
-            }
-            is Resource.Success -> {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Route.PROFILE){
-                        popUpTo(Route.SIGNUP){inclusive = true}
-                    }
+    when (val result = signupFlow) {
+        is Resource.Loading -> { /* show loader */ }
+        is Resource.Success -> {
+            LaunchedEffect(Unit) {
+                navController.navigate(Route.PROFILE) {
+                    popUpTo(Route.SIGNUP) { inclusive = true }
                 }
             }
-            null -> {}
         }
+        is Resource.Failure -> {
+            val context = LocalContext.current
+            Toast.makeText(context, result.e.message, Toast.LENGTH_LONG).show()
+            Log.e("Map", "${result.e.message}")
+        }
+
+        null -> {}
+
     }
+
 }

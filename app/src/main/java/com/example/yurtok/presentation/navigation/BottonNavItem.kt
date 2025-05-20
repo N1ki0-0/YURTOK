@@ -24,4 +24,10 @@ sealed class BottonNavItem(val route: String,
         icon = R.drawable.profile,
         iconFocused = R.drawable.profile2
     )
+    object Application: BottonNavItem(
+        route =Route.APPLICATION,
+        title = "Application",
+        icon = R.drawable.application,
+        iconFocused = R.drawable.application_filled
+    )
 }

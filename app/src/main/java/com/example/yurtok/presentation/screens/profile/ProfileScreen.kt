@@ -31,6 +31,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.example.yurtok.R
 import com.example.yurtok.presentation.navigation.Route
 import com.example.yurtok.presentation.screens.login.LoginScreen
@@ -58,8 +60,8 @@ fun ProfileScreen(
     navController: NavHostController,
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val nameFlow by profileViewModel.user.observeAsState()
-    val context = LocalContext.current
+    val user by profileViewModel.user.collectAsState()
+    val error by profileViewModel.error.collectAsState()
 
     Box(
         modifier = Modifier
@@ -89,7 +91,7 @@ fun ProfileScreen(
                     .background(Color.White)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.cat_),
+                    painter = rememberImagePainter(data = "http://10.0.2.2:8080${user?.avatar}"),
                     contentDescription = "Profile Photo",
                     modifier = Modifier
                         .size(140.dp)
@@ -103,7 +105,7 @@ fun ProfileScreen(
 
             // User Name
             Text(
-                text = nameFlow?.displayName ?: "Name",
+                text = user?.username ?: "Name",
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -134,7 +136,7 @@ fun ProfileScreen(
                     ProfileInfoItem(
                         icon = R.drawable.mail_24dp_e3e3e3,
                         title = "Email",
-                        value = nameFlow?.email ?: "Not provided"
+                        value = user?.email ?: "Not provided"
                     )
 
                     ProfileInfoItem(

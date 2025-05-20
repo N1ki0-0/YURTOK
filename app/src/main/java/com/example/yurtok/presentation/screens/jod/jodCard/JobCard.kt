@@ -1,6 +1,6 @@
 package com.example.yurtok.presentation.screens.jod.jodCard
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -17,14 +17,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,73 +36,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
 import com.example.yurtok.R
+import com.example.yurtok.domain.model.Vacancy
+import com.example.yurtok.presentation.navigation.Route
+import com.example.yurtok.presentation.screens.favorit.FavoritesViewModel
+import com.example.yurtok.presentation.screens.favorit.UiFavoritesEvent
 
 
-data class JobDetails(
-    val id: Int,
-    val icon: Int,
-    val name: String,
-    val serviceType: String,
-    val serviceSubType: String,
-    val rating: Float,
-    val address: String,
-    val experienceYears: Int,
-    val needsEmployment: Boolean,
-    val freeConsultation: Boolean,
-    val workDays: String,
-    val description: String,
-    val email: String,
-    val phone: String,
-    val priceList: List<Pair<String, String>>,
-    val tags: List<String> = emptyList()
-)
-
-// Примеры данных
-val sampleJobs = listOf(
-    JobDetails(
-        id = 1,
-        icon = R.drawable.skn,
-        name = "Иван Иванов",
-        serviceType = "Юрист",
-        serviceSubType = "Трудовое право",
-        rating = 4.8f,
-        address = "Москва, ул. Нагорская",
-        experienceYears = 5,
-        needsEmployment = true,
-        freeConsultation = true,
-        workDays = "Пн–Пт",
-        description = "Профессиональный юрист с опытом в трудовом праве...",
-        email = "ivan@example.com",
-        phone = "+7 999 123-45-67",
-        priceList = listOf(
-            "Сделки с недвижимостью" to "5000 ₽",
-            "Жилищные споры" to "10000 ₽"
-        ),
-        tags = listOf("Трудовые споры", "Увольнение")
-    ),
-    JobDetails(
-        id = 2,
-        icon = R.drawable.gur,
-        name = "Мария Петрова",
-        serviceType = "Адвокат",
-        serviceSubType = "Уголовное право",
-        rating = 4.5f,
-        address = "Санкт-Петербург, Невский пр.",
-        experienceYears = 8,
-        needsEmployment = false,
-        freeConsultation = false,
-        workDays = "Пн–Сб",
-        description = "Опытный адвокат по уголовным делам...",
-        email = "maria@example.com",
-        phone = "+7 912 345-67-89",
-        priceList = listOf(
-            "Защита в суде" to "15000 ₽",
-            "Консультация" to "3000 ₽"
-        ),
-        tags = listOf("Уголовные дела", "Апелляции")
-    )
-)
 
 data class Job(
     val icon: Int,
@@ -122,13 +69,33 @@ val jobs = listOf(
 )
 
 @Composable
-fun JobCard(job: Job, modifier: Modifier = Modifier) {
+fun JobCard(vacancy: Vacancy,
+            modifier: Modifier = Modifier,
+            navController: NavHostController,
+            favoritesViewModel: FavoritesViewModel = hiltViewModel()
+) {
+    val favState by favoritesViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val isAuth = favState.isAuth
+
+    LaunchedEffect(Unit) {
+        favoritesViewModel.events.collect{ event ->
+            when(event){
+                is UiFavoritesEvent.ShowError ->
+                    Toast.makeText(context, event.messang, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    val isFavorite = vacancy.id in favState.favorites
+
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(Color.White),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
+        //val isFavorite = favoritesViewModel.favoriteVacancyIds.collectAsState().value.contains(vacancy.id)
         Row(
             modifier = Modifier
                 .padding(16.dp)
@@ -136,7 +103,8 @@ fun JobCard(job: Job, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = job.icon), contentDescription = "Фото",
+                painter = rememberImagePainter(data = "http://10.0.2.2:8080${vacancy.icon}"),
+                contentDescription = "Фото",
                 modifier = Modifier
                     .padding(end = 5.dp)
                     .size(60.dp)
@@ -147,21 +115,14 @@ fun JobCard(job: Job, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = job.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(text = vacancy.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
                 Row {
-                    Text(text = job.company, fontSize = 14.sp, color = Color.Gray)
-                    if (job.isSponsored) {
-                        Text(
-                            text = " Спонсировано",
-                            fontSize = 14.sp,
-                            color = colorResource(R.color.teal_200),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(text = vacancy.serviceType, fontSize = 14.sp, color = Color.Gray)
+
                 }
 
-                Text(text = job.location, fontSize = 12.sp, color = Color.Gray)
+                Text(text = vacancy.address, fontSize = 12.sp, color = Color.Gray)
 
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -173,10 +134,10 @@ fun JobCard(job: Job, modifier: Modifier = Modifier) {
                             .background(colorResource(R.color.teal_200), RoundedCornerShape(8.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        Text(text = "Стаж: ${job.experienceYears} лет", color = Color.White, fontSize = 12.sp)
+                        Text(text = "Стаж: ${vacancy.experienceYears} лет", color = Color.White, fontSize = 12.sp)
                     }
 
-                    if (job.needsEmployment) {
+                    if (vacancy.needsEmployment) {
                         Box(
                             modifier = Modifier
                                 .padding(end = 8.dp)
@@ -191,18 +152,32 @@ fun JobCard(job: Job, modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // ⭐ Рейтинг (звездочки)
-                RatingStars(rating = job.rating)
+                RatingStars(rating = vacancy.rating)
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
             Column(horizontalAlignment = Alignment.End) {
-                Icon(
-                    painter = painterResource(id = R.drawable.bookmark),
-                    contentDescription = "Закладка",
-                    tint = colorResource(R.color.black),
-                    modifier = Modifier.size(24.dp)
-                )
+                IconButton(onClick =
+                {
+                    if(isAuth){
+                        favoritesViewModel.toggleFavorite(vacancy.id)
+                    }else{
+                        navController.navigate(Route.LOGIN){
+                            navController.popBackStack(Route.SEARCH, inclusive = false)
+                        }
+                    }
+                },
+
+                ) {
+                    Icon(
+                        painter = painterResource
+                            (id = if (isFavorite) R.drawable.bookmark_filled else R.drawable.bookmark),
+                        contentDescription = "Закладка",
+                        tint = Color(0xFF6A88F5),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(4.dp))
             }
@@ -233,9 +208,9 @@ fun RatingStars(rating: Float, size: Dp = 24.dp) {
 @Preview
 @Composable
 fun ScreensJod(){
-    val job = jobs.get(2)
-    val modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)
-    JobCard(job, modifier)
+//    val job = jobs.get(2)
+//    val modifier = Modifier
+//        .fillMaxWidth()
+//        .padding(8.dp)
+//    JobCard(job, modifier)
 }

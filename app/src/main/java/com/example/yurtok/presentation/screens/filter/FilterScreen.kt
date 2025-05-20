@@ -75,11 +75,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.yurtok.R
+import com.example.yurtok.presentation.navigation.Route
 import com.example.yurtok.presentation.screens.jod.jodCard.RatingStars
 
 @Composable
 fun FilterScreen(
+    navController: NavHostController,
     selectedService: String,
     onServiceChange: (String) -> Unit,
     needsEmployment: Boolean?,
@@ -109,7 +112,7 @@ fun FilterScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
-                            onClick = { /* Back */ },
+                            onClick = { navController.navigate(Route.SEARCH) },
                             modifier = Modifier.size(40.dp)
                         ) {
                             Icon(
@@ -413,21 +416,21 @@ fun fan(){
 //        Spacer(modifier = Modifier.height(16.dp))
 
         // Сам экран фильтрации
-        FilterScreen(
-            selectedService = selectedService,
-            onServiceChange = onServiceChange,
-            needsEmployment = needsEmployment,
-            onNeedsEmploymentChange = onNeedsEmploymentChange,
-            freeConsultation = freeConsultation,
-            onFreeConsultationChange = onFreeConsultationChange,
-            experienceRange = experienceRange,
-            onExperienceChange = onExperienceChange,
-            rating = rating,
-            onRatingChange = onRatingChange,
-            location = location,
-            onLocationChange = onLocationChange,
-            onReset = onReset,
-            onSubmit = onSubmit
-        )
+//        FilterScreen(
+//            selectedService = selectedService,
+//            onServiceChange = onServiceChange,
+//            needsEmployment = needsEmployment,
+//            onNeedsEmploymentChange = onNeedsEmploymentChange,
+//            freeConsultation = freeConsultation,
+//            onFreeConsultationChange = onFreeConsultationChange,
+//            experienceRange = experienceRange,
+//            onExperienceChange = onExperienceChange,
+//            rating = rating,
+//            onRatingChange = onRatingChange,
+//            location = location,
+//            onLocationChange = onLocationChange,
+//            onReset = onReset,
+//            onSubmit = onSubmit,
+//        )
     }
 }
